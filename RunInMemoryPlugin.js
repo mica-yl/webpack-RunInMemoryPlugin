@@ -11,7 +11,7 @@ const pluginName = 'RunInMemoryPlugin';
 // DONE : move as a module
 // DONE : custom mainAsset
 // DONE :  rename mainAsset
-// TODO : Add to github.
+// DONE : Add to github.
 
 class RunInMemoryPlugin {
   /**
