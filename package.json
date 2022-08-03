@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "RunInMemoryPlugin.js",
+  "types": "./dist/RunInMemoryPlugin.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,5 +19,8 @@
     "memfs": "^3.4.7",
     "unionfs": "^4.4.0",
     "webpack": "^5.74.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.7.4"
   }
 }
