@@ -6,13 +6,15 @@ This is a webpack plugin to do build in memory instead of disk and then require 
 
 ## how to use?
 
-add a new instance of the plugin to plugins array and provide it with options object has `reqireFile` property to be required once after build. 
+add a new instance of the plugin to plugins array and provide it with options object has `reqireFile` property to be required once after build.
 
 
 example : `webpack.config.js`
 
 ```javascript
 const path = require('path');
+const RunInMemoryPlugin = require('RunInMemoryPlugin');
+
 module.exports = {
  mode: 'development',
  entry: {
