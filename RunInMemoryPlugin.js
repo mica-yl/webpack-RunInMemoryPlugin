@@ -8,10 +8,6 @@ const { join } = require("path");
 
 /* eslint-disable class-methods-use-this */
 const pluginName = 'RunInMemoryPlugin';
-// DONE : move as a module
-// DONE : custom mainAsset
-// DONE :  rename mainAsset
-// DONE : Add to github.
 
 class RunInMemoryPlugin {
   /**
