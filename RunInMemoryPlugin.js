@@ -10,25 +10,27 @@ const { join } = require("path");
 const pluginName = 'RunInMemoryPlugin';
 
 class RunInMemoryPlugin {
+
   /**
-   * @typedef {{requireFile:string}} RunInMemoryPluginOptions 
+   * @typedef {{requireFile:string|false}} RunInMemoryPluginOptions 
    * @param {RunInMemoryPluginOptions} options 
    */
   constructor(options) {
-    this.isRunning = false;
     /**
      * a path to a js file to be required after complition
      */
     this.requireFile = options?.requireFile;
-    const softVol = new Volume();
-    const softFs = createFsFromVolume(softVol);
-    hybridFs
-      .use(solidFs)
-      .use(softFs);
-    this.softFs = softFs;
-    this.hybridFs = hybridFs;
-
   }
+
+
+  #isRunning = false;
+
+  #softFs = createFsFromVolume(new Volume());
+
+  #hybridFs = hybridFs
+    .use(solidFs)
+    .use(this.#softFs);
+
 
   /**
    * 
@@ -38,19 +40,19 @@ class RunInMemoryPlugin {
     compiler.hooks.run.tap(
       pluginName, (compilation) => {
         // eslint-disable-next-line no-param-reassign
-        compilation.outputFileSystem = this.softFs;
+        compilation.outputFileSystem = this.#softFs;
       });
 
     compiler.hooks.watchRun.tap(
       pluginName, (compilation) => {
         // eslint-disable-next-line no-param-reassign
-        compilation.outputFileSystem = this.softFs;
+        compilation.outputFileSystem = this.#softFs;
       });
     // TODO can it run with tap ?
     compiler.hooks.afterEmit.tapAsync(
       pluginName,
       (compilation, next) => {
-        if (!this.requireFile) {
+        if (!this.requireFile & this.requireFile !== false) {
           const assets = compilation.getAssets();
           this.requireFile = join(compiler.outputPath, assets[0].name);
           console.log(`did't provide a requireFile. using first asset of : ${assets}`);
@@ -61,9 +63,9 @@ class RunInMemoryPlugin {
 
     compiler.hooks.afterDone.tap(
       pluginName, async () => {
-        if (!this.isRunning) {
-          this.isRunning = true;
-          patchRequire(this.hybridFs);
+        if (!this.#isRunning && this.requireFile !== false) {
+          this.#isRunning = true;
+          patchRequire(this.#hybridFs);
           console.log('=====App====');
           require(this.requireFile);// in softFs
         }
