@@ -62,12 +62,14 @@ class RunInMemoryPlugin {
     );
 
     compiler.hooks.afterDone.tap(
-      pluginName, async () => {
+      pluginName, () => {
         if (!this.#isRunning && this.requireFile !== false) {
           this.#isRunning = true;
           patchRequire(this.#hybridFs);
-          console.log('=====App====');
-          require(this.requireFile);// in softFs
+          setTimeout(() => {
+            console.log('=====App====');
+            require(this.requireFile);// in softFs
+          });
         }
       });
   }
