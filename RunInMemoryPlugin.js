@@ -11,8 +11,9 @@ const pluginName = 'RunInMemoryPlugin';
 
 class RunInMemoryPlugin {
 
+  #restartOnErrors = true ;
   /**
-   * @typedef {{requireFile:string|false}} RunInMemoryPluginOptions 
+   * @typedef {{requireFile?:string|false,restartOnErrors?:boolean}} RunInMemoryPluginOptions 
    * @param {RunInMemoryPluginOptions} options 
    */
   constructor(options) {
@@ -20,9 +21,12 @@ class RunInMemoryPlugin {
      * a path to a js file to be required after complition
      */
     this.requireFile = options?.requireFile;
+    if (options.restartOnErrors !== undefined){
+      this.#restartOnErrors = options.restartOnErrors ;
+    }
   }
 
-
+  
   #isRunning = false;
 
   #softFs = createFsFromVolume(new Volume());
@@ -62,12 +66,33 @@ class RunInMemoryPlugin {
     );
 
     compiler.hooks.afterDone.tap(
-      pluginName, () => {
-        if (!this.#isRunning && this.requireFile !== false) {
+      pluginName, (stats) => {
+        // TODO run when there is no error 
+        // TODO Rerun
+
+        if (stats.hasErrors() && this.#restartOnErrors){
+          this.#isRunning = false;
+        }
+
+        if (!stats.hasErrors() && !this.#isRunning && this.requireFile !== false) {
           this.#isRunning = true;
           patchRequire(this.#hybridFs);
           setTimeout(() => {
             console.log('=====App====');
+            globalThis.$module = {
+              /**
+               * call in HMR when module fails to restart 
+               *    on next successful compilation.
+               * @returns 
+               */
+              failed: () => {
+                this.#isRunning = false;
+                console.log('app signaled a failure !')
+                return true;
+              },
+            };
+            // refresh cache
+            delete require.cache[this.requireFile];
             require(this.requireFile);// in softFs
           });
         }

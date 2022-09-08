@@ -5,7 +5,9 @@
   "main": "RunInMemoryPlugin.js",
   "types": "./dist/RunInMemoryPlugin.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test:explore": "webpack -c test/test.config.js",
+    "test:explore-watch": "webpack -w -c test/test.config.js"
   },
   "keywords": [
     "webpack",
@@ -21,6 +23,7 @@
     "webpack": "^5.74.0"
   },
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "webpack-cli": "^4.10.0"
   }
 }
